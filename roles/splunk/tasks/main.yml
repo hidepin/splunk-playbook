@@ -1,0 +1,17 @@
+---
+# file: roles/splunk/tasks/main.yml
+- name: splunk check
+  command: rpm -q splunk
+  register: is_splunk_installed
+  failed_when: is_splunk_installed.rc not in [0,1]
+  changed_when: is_splunk_installed.rc != 0
+
+- name: splunk rpm copy
+  copy: src={{ splunk_rpm }} dest=/tmp
+  when: is_splunk_installed.rc == 1
+
+- name: splunk install
+  yum: name={{item}} state=present
+  with_items:
+    - "{{ splunk_rpm }}"
+  when: is_splunk_installed.rc == 1
