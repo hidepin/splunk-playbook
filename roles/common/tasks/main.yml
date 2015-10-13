@@ -1,12 +1,19 @@
 ---
 # file: roles/common/tasks/main.yml
+- name: packages install
+  yum: name={{item}} state=present
+  with_items:
+    - openssh-clients
+    - ntp
+    - libselinux-python
+
 - name: selinux check
   command: getenforce
   register: is_selinux_disabled
   failed_when: is_selinux_disabled.rc != 0
   changed_when: is_selinux_disabled.stdout != "Disabled"
 
-- name: disable selinux
+- name: disable selinux setting
   template: src=etc_selinux_config.j2 dest=/etc/selinux/config owner=root group=root mode=0644
   when: is_selinux_disabled.stdout != "Disabled"
 
@@ -27,12 +34,6 @@
   with_items:
     - iptables
     - ip6tables
-
-- name: packages install
-  yum: name={{item}} state=present
-  with_items:
-    - openssh-clients
-    - ntp
 
 - name: add ulimits settings
   template: src=enableulimit.sh.j2 dest=/etc/profile.d/enableulimit.sh owner=root group=root mode=0644
