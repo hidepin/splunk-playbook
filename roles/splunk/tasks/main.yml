@@ -13,3 +13,16 @@
 - name: splunk install
   yum: name=/tmp/{{splunk_rpm}} state=present
   when: is_splunk_installed.rc == 1
+
+- name: splunk init.d check
+  command: ls /etc/init.d/splunk
+  register: is_splunk_enabled
+  failed_when: is_splunk_enabled.rc not in [0,2]
+  changed_when: is_splunk_enabled.rc != 0
+
+- name: splunk enable
+  command: /opt/splunk/bin/splunk enable boot-start
+  when: is_splunk_enabled.rc != 0
+
+- name: splunk service enabled
+  service: name=splunk state=started enabled=yes
