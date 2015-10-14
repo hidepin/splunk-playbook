@@ -21,7 +21,7 @@
   changed_when: is_splunk_enabled.rc != 0
 
 - name: splunk enable
-  command: /opt/splunk/bin/splunk enable boot-start
+  command: /opt/splunk/bin/splunk enable boot-start --accept-license
   when: is_splunk_enabled.rc != 0
 
 - name: splunk service enabled
